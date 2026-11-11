@@ -3,7 +3,7 @@ Copyright © 2021 Ennio Marke
 *******************************************************************************/
 
 document.addEventListener("DOMContentLoaded", () => {
-
+  
   //#region darkmode
   const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
   const currentTheme = localStorage.getItem('theme') ? localStorage.getItem('theme') : null;
@@ -24,69 +24,72 @@ document.addEventListener("DOMContentLoaded", () => {
     else {
         document.documentElement.setAttribute('data-theme', 'light');
         localStorage.setItem('theme', 'light'); //add this
-    }
+    }    
   }
-
-
+  
+  
 
   toggleSwitch.addEventListener('change', switchTheme, false);
   //#endregion
-
+  
   //#region elements
   var output = document.getElementById("output")
   var input = document.getElementById("input")
-  var slider = document.getElementById("speedSlider")
-  var isNum = data => /^\d+$/.test(data);
-  var lastMsg;
-  var msg;
-  var curMai = 1;
   //#endregion
 
-  function load() {
-    var readSpeed;
-    while(!readSpeed) {
-      readSpeed = prompt("Readspeed multiplier? (1-5)")
-      if(readSpeed>5||readSpeed<1||!isNum(readSpeed)) readSpeed = 0
-      readSpeed = parseInt(readSpeed)
-    }
+  $("textarea").each(function () {
+    this.setAttribute("style", "height:" + (this.scrollHeight) + "px;overflow-y:hidden;");
+  }).on("input", function () {
+    this.style.height = "auto";
+    this.style.height = (this.scrollHeight) + "px";
+  });
 
-    while(!lastMsg) {
-      lastMsg = prompt("Message to start with?")
-    }
-    logOutput(lastMsg, 0)
-
-    var forever = setInterval(() => {
-      setTimeout(() => {
-        reqAndLog()
-      }, 5000 / readSpeed );
-    }, 5000 / readSpeed)
-    
+  function logOutput(text) {
+    var ul = document.getElementById("output");
+    var li = document.createElement("li");
+    li.appendChild(document.createTextNode("Four"));
+    ul.appendChild(li);
   }
 
-  function reqAndLog() {
-    $.get(`https://url-req.glitch.me/http://api.brainshop.ai/get?bid=156779&key=0ErJYSb1ZlZmOcel&uid=mai&msg=${lastMsg.cnt}`, data => {
-      msg = data  
-      logOutput(msg.cnt, curMai)
-      lastMsg = msg
-      curMai = !curMai
-    })
-  }
-
-  //output.scrollTop = output.scrollHeight;
-
+  $("textarea").keydown(function(e){
+    // Enter was pressed without shift key
+    if (e.keyCode == 13 && !e.shiftKey)
+    {
+      // prevent default behavior
+      e.preventDefault();
+      if(input.value=="") return
+      logOutput(input.value)
+        $.ajax({
+          url: `/api/mai?uid=${encodeURIComponent(userName)}&msg=${encodeURIComponent(input.value)}`,
+          type: "GET",
+          withCredentials: true,
+          success: function (data) {
+            logOutput(data.cnt, 1)
+            output.scrollTop = output.scrollHeight;
+          	console.log(data)
+          },
+          error: function (xhr, status) {
+            alert("error");
+          }
+        });
+        input.value = "";
+        output.scrollTop = output.scrollHeight;
+    }
+  })
 
   //#region functions
-
     function logOutput(text, cN) {
       var ul = document.getElementById("output");
       var li = document.createElement("li");
       li.appendChild(document.createTextNode(text));
       cN?li.classList.add("pink"):""
       ul.appendChild(li);
-      output.scrollTop = output.scrollHeight;
     }
   //#endregion
 
-    load()
-
+  var userName = prompt("What is your name?")
+  userName.toLowerCase() == "ennio"? 
+  	prompt("psw?").toLowerCase() == "myst"? 
+    	userName == "Mystical_Ennio":userName == "impersonate"
+  :""
 })

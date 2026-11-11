@@ -8,7 +8,14 @@ Copyright © 2021 Ennio Marke
 |_____||_____|  |______|   \______.'  |_____| 
 *******************************************************************************/
 
-document.addEventListener("DOMContentLoaded", () => {
+// Site list comes from the Worker now, not from PHP inline output.
+const pagesReady = fetch("/api/pages")
+        .then((response) => (response.ok ? response.json() : []))
+        .then((list) => (window.Pages = list))
+        .catch(() => (window.Pages = []));
+
+document.addEventListener("DOMContentLoaded", async () => {
+        await pagesReady;
         
         //console.log("Pages: \n" + JSON.stringify(Pages,null,2));
 

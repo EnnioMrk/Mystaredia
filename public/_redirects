@@ -1,0 +1,7 @@
+# Old PHP entry points, kept so old links do not 404.
+/index.php / 301
+/jquery/index.php /jquery/ 301
+/sites/chat/index.php /sites/chat/ 301
+/sites/chat/mai/index.php /sites/chat/mai/ 301
+/sites/chat/mai%20vs%20mai/index.php /sites/chat/mai%20vs%20mai/ 301
+/sites/chat/messages.json /api/chat 301
