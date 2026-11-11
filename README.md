@@ -17,11 +17,25 @@ Branch `recreate`. The `main` branch keeps the original PHP tree.
 
 `assets.run_worker_first` is set to `/api/*` only. A request for a static file never starts the Worker.
 
-## Resource use
+## Live
+
+https://mystaredia.ennio-marke.workers.dev
+
+## Cost: zero
+
+Every product in this build has a free tier. No paid feature is used.
+
+| Product | Free allowance | What this site uses |
+| --- | --- | --- |
+| Workers Free | 100,000 requests/day, 10 ms CPU per request | static files use 0 requests; only `/api/*` counts |
+| D1 Free | 5 million rows read/day, 100,000 rows written/day, 5 GB | 10 rows per poll, 3 rows per message |
+| Static assets | 20,000 files, 25 MiB each | 35 files |
+| workers.dev | free subdomain | `mystaredia.ennio-marke.workers.dev` |
+
+Over a limit the request fails; Cloudflare does not bill the free plan. The tightest cap is the 100,000 requests/day: one chat tab polls every 3 s, which is about 28,800 requests/day. Raise `3000` in `public/sites/chat/index.html` if you run many tabs all day.
 
 - Worker bundle: 4.20 KiB, 1.63 KiB gzip.
 - Bindings: one D1 database. No KV, R2, Queues or Durable Objects.
-- Free plan headroom: 100,000 requests/day, D1 5 million row reads/day and 100,000 writes/day, 500 MB storage.
 - The chat polls every 3 s and stops while the tab is hidden. The old code polled every 500 ms without pause.
 
 ## Layout
@@ -47,6 +61,14 @@ Node 22.12 or newer lets you use a newer wrangler. Remove the exact pin in `pack
 
 ## Deploy
 
+The Worker and the D1 database are live already. To ship a change:
+
+```bash
+npm run deploy
+```
+
+To rebuild from scratch:
+
 ```bash
 npx wrangler login
 npx wrangler d1 create mystaredia          # copy database_id into wrangler.jsonc
@@ -54,8 +76,9 @@ npm run db:remote
 npm run deploy
 ```
 
-Then add the domain: dashboard → Workers & Pages → `mystaredia` → Settings → Domains & Routes.
-Add `mystaredia.de` as a custom domain. The zone `mystaredia.de` must be on Cloudflare.
+D1 database `mystaredia`: `478996b4-824f-49cd-a588-473f674d9302` (region WEUR).
+
+Custom domain: `mystaredia.de` is **not** in this Cloudflare account, so the site runs on the workers.dev URL. Add the zone, then dashboard → Workers & Pages → `mystaredia` → Settings → Domains & Routes → Add custom domain. A subdomain of `ennio.vip` works today with no new zone.
 
 The old `.htaccess` sent `mystaredia.de` to `www.mystaredia.de`. Workers cannot see the host redirect rule. Use a Cloudflare Redirect Rule (Rules → Redirect Rules) for that, or drop it.
 

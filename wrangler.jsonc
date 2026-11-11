@@ -14,7 +14,7 @@
     {
       "binding": "DB",
       "database_name": "mystaredia",
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "478996b4-824f-49cd-a588-473f674d9302",
       "migrations_dir": "migrations"
     }
   ],
